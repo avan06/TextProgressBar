@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ProgressBarSample
+namespace User.Windows.Forms
 {
     public enum ProgressBarDisplayMode
     {
@@ -18,12 +18,14 @@ namespace ProgressBarSample
     public class TextProgressBar : ProgressBar
     {
         [Description("Font of the text on ProgressBar"), Category("Additional Options")]
-        public Font TextFont { get; set; } = new Font(FontFamily.GenericSerif, 11, FontStyle.Bold|FontStyle.Italic);
-        
-        private SolidBrush _textColourBrush = (SolidBrush) Brushes.Black;
+        public Font TextFont { get; set; } = new Font(FontFamily.GenericSerif, 11, FontStyle.Bold | FontStyle.Italic);
+
+        private SolidBrush _textColourBrush = (SolidBrush)Brushes.Black;
         [Category("Additional Options")]
-        public Color TextColor {
-            get {
+        public Color TextColor
+        {
+            get
+            {
                 return _textColourBrush.Color;
             }
             set
@@ -33,7 +35,7 @@ namespace ProgressBarSample
             }
         }
 
-        private SolidBrush _progressColourBrush = (SolidBrush) Brushes.LightGreen;
+        private SolidBrush _progressColourBrush = (SolidBrush)Brushes.LightGreen;
         [Category("Additional Options"), Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
         public Color ProgressColor
         {
@@ -50,8 +52,10 @@ namespace ProgressBarSample
 
         private ProgressBarDisplayMode _visualMode = ProgressBarDisplayMode.CurrProgress;
         [Category("Additional Options"), Browsable(true)]
-        public ProgressBarDisplayMode VisualMode {
-            get {
+        public ProgressBarDisplayMode VisualMode
+        {
+            get
+            {
                 return _visualMode;
             }
             set
@@ -103,16 +107,17 @@ namespace ProgressBarSample
             }
             set { }
         }
-        
+
         private string _percentageStr { get { return $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100 } %"; } }
 
-        private string _currProgressStr {
+        private string _currProgressStr
+        {
             get
             {
                 return $"{Value}/{Maximum}";
             }
         }
-        
+
         public TextProgressBar()
         {
             Value = Minimum;
@@ -127,7 +132,7 @@ namespace ProgressBarSample
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            
+
             DrawProgressBar(g);
 
             DrawStringIfNeeded(g);
@@ -153,17 +158,17 @@ namespace ProgressBarSample
         {
             if (VisualMode != ProgressBarDisplayMode.NoText)
             {
-                
+
                 string text = _textToDraw;
 
                 SizeF len = g.MeasureString(text, TextFont);
 
                 Point location = new Point(((Width / 2) - (int)len.Width / 2), ((Height / 2) - (int)len.Height / 2));
-                
+
                 g.DrawString(text, TextFont, (Brush)_textColourBrush, location);
             }
         }
-        
+
         public new void Dispose()
         {
             _textColourBrush.Dispose();
@@ -172,4 +177,3 @@ namespace ProgressBarSample
         }
     }
 }
-
