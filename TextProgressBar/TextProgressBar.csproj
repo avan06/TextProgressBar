@@ -7,7 +7,7 @@
     <ProjectGuid>{D69AB923-1DBC-40D0-957C-3182F99A3374}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>User.Windows.Forms</RootNamespace>
-    <AssemblyName>User.Windows.Forms.TextProgressBar</AssemblyName>
+    <AssemblyName>TextProgressBar</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
