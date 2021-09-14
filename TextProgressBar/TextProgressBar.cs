@@ -12,11 +12,36 @@ namespace User.Windows.Forms
         CurrProgress,
         CustomText,
         TextAndPercentage,
-        TextAndCurrProgress
+        TextAndCurrProgress,
+        TextAndPercentageIsolation,
+        TextAndCurrProgressIsolation,
     }
 
     public class TextProgressBar : ProgressBar
     {
+        private ContentAlignment _textAlignValue = ContentAlignment.MiddleCenter;
+        [DefaultValue(ContentAlignment.MiddleCenter), Category("Additional Options"), Description("Align value of text on ProgressBar")]
+        public ContentAlignment TextAlignValue
+        {
+            get => _textAlignValue;
+            set { 
+                _textAlignValue = value;
+                Invalidate();
+            }
+        }
+
+        private ContentAlignment _customTextAlignValue = ContentAlignment.MiddleLeft;
+        [DefaultValue(ContentAlignment.MiddleLeft), Category("Additional Options"), Description("Align value of custom text on ProgressBar when the VisualMode is isolation")]
+        public ContentAlignment CustomTextAlignValue
+        {
+            get => _customTextAlignValue;
+            set
+            {
+                _customTextAlignValue = value;
+                Invalidate();
+            }
+        }
+
         [Description("Font of the text on ProgressBar"), Category("Additional Options")]
         public Font TextFont { get; set; } = new Font(FontFamily.GenericSerif, 11, FontStyle.Bold | FontStyle.Italic);
 
@@ -24,10 +49,7 @@ namespace User.Windows.Forms
         [Category("Additional Options")]
         public Color TextColor
         {
-            get
-            {
-                return _textColourBrush.Color;
-            }
+            get => _textColourBrush.Color;
             set
             {
                 _textColourBrush.Dispose();
@@ -39,10 +61,7 @@ namespace User.Windows.Forms
         [Category("Additional Options"), Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
         public Color ProgressColor
         {
-            get
-            {
-                return _progressColourBrush.Color;
-            }
+            get => _progressColourBrush.Color;
             set
             {
                 _progressColourBrush.Dispose();
@@ -54,10 +73,7 @@ namespace User.Windows.Forms
         [Category("Additional Options"), Browsable(true)]
         public ProgressBarDisplayMode VisualMode
         {
-            get
-            {
-                return _visualMode;
-            }
+            get => _visualMode;
             set
             {
                 _visualMode = value;
@@ -70,10 +86,7 @@ namespace User.Windows.Forms
         [Description("If it's empty, % will be shown"), Category("Additional Options"), Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
         public string CustomText
         {
-            get
-            {
-                return _text;
-            }
+            get => _text;
             set
             {
                 _text = value;
@@ -90,9 +103,11 @@ namespace User.Windows.Forms
                 switch (VisualMode)
                 {
                     case (ProgressBarDisplayMode.Percentage):
+                    case (ProgressBarDisplayMode.TextAndPercentageIsolation):
                         text = _percentageStr;
                         break;
                     case (ProgressBarDisplayMode.CurrProgress):
+                    case (ProgressBarDisplayMode.TextAndCurrProgressIsolation):
                         text = _currProgressStr;
                         break;
                     case (ProgressBarDisplayMode.TextAndCurrProgress):
@@ -108,15 +123,9 @@ namespace User.Windows.Forms
             set { }
         }
 
-        private string _percentageStr { get { return $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100 } %"; } }
+        private string _percentageStr { get => $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100 } %"; }
 
-        private string _currProgressStr
-        {
-            get
-            {
-                return $"{Value}/{Maximum}";
-            }
-        }
+        private string _currProgressStr { get => $"{Value}/{Maximum}"; }
 
         public TextProgressBar()
         {
@@ -158,14 +167,36 @@ namespace User.Windows.Forms
         {
             if (VisualMode != ProgressBarDisplayMode.NoText)
             {
-
                 string text = _textToDraw;
-
                 SizeF len = g.MeasureString(text, TextFont);
+                int x, y;
+                if (_textAlignValue.ToString().Contains("Left")) x = 0;
+                else if (_textAlignValue.ToString().Contains("Right")) x = Width - (int)len.Width;
+                else x = Width / 2 - (int)len.Width / 2;
 
-                Point location = new Point(((Width / 2) - (int)len.Width / 2), ((Height / 2) - (int)len.Height / 2));
+                if (_textAlignValue.ToString().Contains("Top")) y = 0;
+                else if (_textAlignValue.ToString().Contains("Bottom")) y = Height - (int)len.Height;
+                else y = Height / 2 - (int)len.Height / 2;
+
+                Point location = new Point(x, y);
 
                 g.DrawString(text, TextFont, (Brush)_textColourBrush, location);
+
+                if (VisualMode.ToString().Contains("Isolation"))
+                {
+                    len = g.MeasureString(CustomText, TextFont);
+                    if (_customTextAlignValue.ToString().Contains("Left")) x = 0;
+                    else if (_customTextAlignValue.ToString().Contains("Right")) x = Width - (int)len.Width;
+                    else x = Width / 2 - (int)len.Width / 2;
+
+                    if (_customTextAlignValue.ToString().Contains("Top")) y = 0;
+                    else if (_customTextAlignValue.ToString().Contains("Bottom")) y = Height - (int)len.Height;
+                    else y = Height / 2 - (int)len.Height / 2;
+
+                    location = new Point(x, y);
+
+                    g.DrawString(CustomText, TextFont, (Brush)_textColourBrush, location);
+                }
             }
         }
 
